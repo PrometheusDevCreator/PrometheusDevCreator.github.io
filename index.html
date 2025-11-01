@@ -121,7 +121,7 @@
    ?img=URL_TO_VOUCHER&to=Claire&redeem=https://...&accent=%23ff9ecf
 ------------------------------------------------------------------------- */
 const params = new URLSearchParams(location.search);
-const imgURL = params.get('img') || 'voucher.jpg'; // place a voucher.jpg next to this file, or use ?img=
+const imgURL = params.get('img') || 'TrinnyVoucher.png';
 const toName = params.get('to') || 'Claire';
 const redeemURL = params.get('redeem') || 'https://www.trinnylondon.com/';
 const accent = params.get('accent'); if (accent) document.documentElement.style.setProperty('--accent', accent);
@@ -249,3 +249,4 @@ console.log(location.origin + location.pathname + '?to=Claire&img=/voucher.jpg&r
 </script>
 </body>
 </html>
+
