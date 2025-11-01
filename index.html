@@ -3,113 +3,130 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Happy Birthday, My Darling! 🎁</title>
-<meta name="description" content="Click the tiles to reveal your gift…">
+<title>For Claire — Birthday Reveal</title>
+<meta name="description" content="Click the tiles to reveal your gift.">
 <style>
-  :root {
-    --size: min(90vmin, 640px);
-    --tile: calc(var(--size) / 3);
-    --accent: #ff9ecf; /* gentle pink */
-    --bg: #0f0f12;
-    --tileTop: #f6e9f0;
+  :root{
+    /* Card size (rectangular so tiles are rectangles) */
+    --w: min(92vw, 900px);
+    --h: min(78vh, 580px);
+
+    /* Grid size */
+    --cols: 21;
+    --rows: 21;
+
+    /* Derived tile size */
+    --tw: calc(var(--w) / var(--cols));
+    --th: calc(var(--h) / var(--rows));
+
+    --accent: #ff9ecf;
+    --bg: #0f1115;
   }
   html, body { height:100%; margin:0; }
-  body {
+  body{
     display:flex; align-items:center; justify-content:center;
     background: radial-gradient(1200px at 20% -10%, #1b1b23, #0a0a0c 70%), var(--bg);
     color:#fff; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
-  .card {
-    width:var(--size); max-width:95vw; aspect-ratio:1/1;
+  .card{
+    width: var(--w); height: var(--h);
     position:relative; perspective:1000px;
-    border-radius:24px; overflow:hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    border-radius:22px; overflow:hidden;
+    box-shadow: 0 22px 60px rgba(0,0,0,.45);
     background:#111;
   }
-  .image {
+  .image{
     position:absolute; inset:0;
-    background: center/cover no-repeat;
+    background: center / cover no-repeat;
     filter:saturate(1.05);
   }
-  /* blur overlay before start */
-  .veil {
-    position:absolute; inset:0; backdrop-filter: blur(8px) brightness(.5);
-    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.8rem;
+  /* Vignette + soft glow for presentation */
+  .image::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(70% 60% at 50% 50%, rgba(255,255,255,0) 60%, rgba(0,0,0,.25) 100%);
   }
-  .veil h1 { margin:0; font-weight:700; letter-spacing:.3px; }
-  .veil a.start {
+  .image::after{
+    content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen;
+    background: radial-gradient(35% 25% at 50% 52%, rgba(255,245,180,.45), rgba(255,245,180,0) 55%);
+    opacity:.65;
+  }
+
+  /* Start veil */
+  .veil{
+    position:absolute; inset:0; backdrop-filter: blur(8px) brightness(.55);
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.85rem;
+    text-align:center;
+  }
+  .brand{ position:absolute; top:10px; left:12px; opacity:.8; font-size:.9rem; }
+  .brand b{ color:var(--accent); }
+
+  .veil h1{ margin:.2rem 0 0; letter-spacing:.3px; }
+  .subtitle{ opacity:.85; font-size:.95rem }
+  .start{
     color:#111; background:linear-gradient(135deg,var(--accent),#ffd3e6);
-    text-decoration:none; font-weight:700; padding:.85rem 1.1rem; border-radius:999px;
+    text-decoration:none; font-weight:800; padding:.85rem 1.15rem; border-radius:999px;
     box-shadow:0 8px 24px rgba(0,0,0,.35);
   }
-  .subtitle { opacity:.8; font-size:.95rem }
-  /* 3x3 tile grid */
-  .tiles { position:absolute; inset:0; transform-style:preserve-3d; }
-  .tile {
-    position:absolute; width:var(--tile); height:var(--tile);
-    background: conic-gradient(from 200deg at 30% 30%, #ffffff, var(--tileTop));
-    border:1px solid rgba(255,255,255,.18);
-    box-shadow: 0 8px 24px rgba(0,0,0,.35);
-    cursor:pointer; transition: transform .7s cubic-bezier(.19,1,.22,1), opacity .7s ease;
-    display:grid; place-items:center; font-weight:700; color:#333; user-select:none;
+
+  /* Tiles */
+  .tiles{ position:absolute; inset:0; transform-style:preserve-3d; }
+  .tile{
+    position:absolute; width:var(--tw); height:var(--th);
+    border-radius:8px; border:1px solid rgba(255,255,255,.16);
+    box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    cursor:pointer; user-select:none;
+    transition: transform .7s cubic-bezier(.19,1,.22,1), opacity .7s ease, filter .2s ease;
   }
-  .tile:hover { transform: translateZ(1px) scale(1.015); }
-  .tile.fall {
+  .tile:hover{ filter:brightness(1.05); transform: translateZ(2px) scale(1.02); }
+  .tile.fall{
     opacity:0; pointer-events:none;
-    transform: translate3d(var(--tx), var(--ty), -120px) rotate3d(var(--rx), var(--ry), 0, var(--rot));
+    transform: translate3d(var(--tx), var(--ty), -140px) rotate3d(var(--rx), var(--ry), 0, var(--rot));
   }
-  .hud {
-    position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
-    font-size:.9rem; opacity:.75; text-align:center;
+
+  /* HUD + Final */
+  .hud{
+    position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+    font-size:.9rem; opacity:.8; text-align:center; background:rgba(0,0,0,.28);
+    padding:.2rem .6rem; border-radius:10px;
   }
-  .final {
+  .final{
     position:absolute; inset:0; display:none; place-items:center; text-align:center;
-    background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.45) 55%, rgba(0,0,0,.7));
+    background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.5) 55%, rgba(0,0,0,.7));
   }
-  .final.show { display:grid; animation: pop .5s ease-out both; }
-  @keyframes pop { from { transform:scale(.98); opacity:0 } to { transform:scale(1); opacity:1 } }
-  .final .box {
-    background: rgba(255,255,255,.1);
-    border:1px solid rgba(255,255,255,.2);
+  .final.show{ display:grid; animation:pop .5s ease-out both; }
+  @keyframes pop{ from{ opacity:0; transform:scale(.98)} to{ opacity:1; transform:scale(1)} }
+  .final .box{
+    background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2);
     padding:1rem 1.25rem; border-radius:16px; backdrop-filter: blur(6px);
   }
-  .btn {
-    display:inline-block; margin-top:.6rem; padding:.6rem .9rem; border-radius:10px; font-weight:700;
+  .btn{
+    display:inline-block; margin-top:.6rem; padding:.6rem .9rem; border-radius:10px; font-weight:800;
     background:linear-gradient(135deg,#ffe075,#ffc14d); color:#111; text-decoration:none;
     box-shadow:0 6px 18px rgba(0,0,0,.35);
   }
-  .brand {
-    position:absolute; top:10px; left:12px; font-size:.9rem; opacity:.7; letter-spacing:.3px;
-  }
-  .brand b { color: var(--accent); }
-  /* small footer link style */
-  .smalllink { color:#bbb; text-underline-offset:3px; }
+  .smalllink{ color:#bbb; text-underline-offset:3px; }
 </style>
 </head>
 <body>
   <div class="card" id="card">
-    <!-- background image (voucher) -->
     <div class="image" id="bg"></div>
 
-    <!-- pre-start veil -->
     <div class="veil" id="veil">
-      <div class="brand">For <b>Claire</b> • 01 Nov 2025</div>
+      <div class="brand">For <b>Claire</b> • <span id="dateTag"></span></div>
       <h1>Click to reveal your surprise</h1>
-      <div class="subtitle">9 tiles. 9 taps. Treats await.</div>
+      <div class="subtitle">441 colourful rectangles stand between you and glory.</div>
       <a href="#open" class="start" id="startLink">Open the gift</a>
       <div class="subtitle" style="font-size:.85rem;">(or press <span style="font-family:monospace">Enter</span>)</div>
     </div>
 
-    <!-- tiles -->
     <div class="tiles" id="tiles" aria-label="Click tiles to reveal"></div>
 
-    <!-- HUD -->
-    <div class="hud" id="hud">9 tiles remaining</div>
+    <div class="hud" id="hud">441 tiles remaining</div>
 
-    <!-- final message -->
     <div class="final" id="final">
       <div class="box">
-        <div style="font-size:1.1rem; font-weight:700;">Happy Birthday, Claire! 🎉</div>
-        <div style="opacity:.85; margin-top:.25rem;">Enjoy your Trinny London treat.</div>
+        <div style="font-size:1.1rem; font-weight:800;">Happy Birthday, Claire! 🎉</div>
+        <div style="opacity:.9; margin-top:.25rem;">Enjoy your Trinny London treat.</div>
         <a class="btn" id="redeemBtn" target="_blank" rel="noopener">Redeem</a>
         <div style="margin-top:.5rem;"><a id="reset" href="#" class="smalllink">Reset tiles</a></div>
       </div>
@@ -117,136 +134,143 @@
   </div>
 
 <script>
-/* --- Config via URL params ----------------------------------------------
-   ?img=URL_TO_VOUCHER&to=Claire&redeem=https://...&accent=%23ff9ecf
-------------------------------------------------------------------------- */
+/* ---------- Config via URL params -----------------------------------------
+   ?img=URL_TO_VOUCHER&to=Claire&redeem=https://...&accent=%23ff9ecf&fit=contain
+--------------------------------------------------------------------------- */
 const params = new URLSearchParams(location.search);
-const imgURL = params.get('img') || 'TrinnyVoucher.png';
-const toName = params.get('to') || 'Claire';
-const redeemURL = params.get('redeem') || 'https://www.trinnylondon.com/';
-const accent = params.get('accent'); if (accent) document.documentElement.style.setProperty('--accent', accent);
+const imgURL   = params.get('img')    || 'TrinnyVoucher.png';
+const toName   = params.get('to')     || 'Claire';
+const redeem   = params.get('redeem') || 'https://www.trinnylondon.com/';
+const accent   = params.get('accent');
+const fit      = (params.get('fit') || 'cover').toLowerCase(); // 'cover' | 'contain'
+if (accent) document.documentElement.style.setProperty('--accent', accent);
 
-/* --- Elements ---------------------------------------------------------- */
-const bg = document.getElementById('bg');
+const dateTag  = document.getElementById('dateTag');
+dateTag.textContent = new Date().toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'});
+
+const bg    = document.getElementById('bg');
 const tiles = document.getElementById('tiles');
-const veil = document.getElementById('veil');
+const veil  = document.getElementById('veil');
 const startLink = document.getElementById('startLink');
-const hud = document.getElementById('hud');
+const hud   = document.getElementById('hud');
 const final = document.getElementById('final');
 const redeemBtn = document.getElementById('redeemBtn');
 const reset = document.getElementById('reset');
-document.querySelector('.brand').innerHTML = `For <b>${toName}</b> • ${new Date().toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'})}`;
 
-/* --- Background image -------------------------------------------------- */
 bg.style.backgroundImage = `url('${imgURL}')`;
+bg.style.backgroundSize  = (fit === 'contain' ? 'contain' : 'cover');
+bg.style.backgroundColor = (fit === 'contain' ? '#111' : 'transparent');
 
-/* --- Build tiles ------------------------------------------------------- */
-const N = 3; // 3x3
-let remaining = N*N;
+/* ---------- Build a 21x21 grid of multi-colour rectangular tiles ---------- */
+const COLS = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cols')) || 21;
+const ROWS = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--rows')) || 21;
+let remaining = COLS * ROWS;
 
-function placeTiles() {
+function placeTiles(){
   tiles.innerHTML = '';
-  const size = tiles.clientWidth; // for random directions
-  for (let r=0; r<N; r++){
-    for (let c=0; c<N; c++){
+  const rect = tiles.getBoundingClientRect();
+  for (let r=0;r<ROWS;r++){
+    for (let c=0;c<COLS;c++){
       const t = document.createElement('button');
       t.className = 'tile';
-      t.setAttribute('aria-label', `Tile ${r*N+c+1}`);
-      t.style.top  = `calc(${r} * var(--tile))`;
-      t.style.left = `calc(${c} * var(--tile))`;
-      t.textContent = '🎁';
-      // random fall direction & rotation
-      const dx = (Math.random() * 2 - 1) * size * .8;
-      const dy = (Math.random() * 2 - 1) * size * .8;
+      t.style.top  = `calc(${r} * var(--th))`;
+      t.style.left = `calc(${c} * var(--tw))`;
+
+      // colourful gradients per tile (vary over the grid)
+      const baseHue = (r/ROWS)*360 + (c/COLS)*90;
+      const h1 = (baseHue + Math.random()*20) % 360;
+      const h2 = (h1 + 35) % 360;
+      t.style.background = `linear-gradient(135deg, hsl(${h1} 85% 66%), hsl(${h2} 85% 58%))`;
+
+      // unique flight path for the fall
+      const dx = (Math.random() * 2 - 1) * rect.width  * .9;
+      const dy = (Math.random() * 2 - 1) * rect.height * .9;
       const rx = (Math.random() * 2 - 1).toFixed(2);
       const ry = (Math.random() * 2 - 1).toFixed(2);
-      const rot = (Math.random() * 140 + 80).toFixed(0) + 'deg';
+      const rot = (Math.random()*140 + 80).toFixed(0) + 'deg';
       t.style.setProperty('--tx', dx+'px');
       t.style.setProperty('--ty', dy+'px');
       t.style.setProperty('--rx', rx);
       t.style.setProperty('--ry', ry);
       t.style.setProperty('--rot', rot);
-      t.addEventListener('click', () => hideTile(t));
+
+      t.addEventListener('click', ()=>hideTile(t));
       tiles.appendChild(t);
     }
   }
-  remaining = N*N;
+  remaining = COLS * ROWS;
   updateHUD();
 }
 placeTiles();
 
-/* --- Start interaction ------------------------------------------------- */
-function start() {
-  veil.style.display = 'none';
-}
+/* ---------- Start interaction ------------------------------------------- */
+function start(){ veil.style.display='none'; }
 startLink.addEventListener('click', (e)=>{ e.preventDefault(); start(); history.replaceState({},'',location.pathname+location.search+'#open'); });
 document.addEventListener('keydown', e=>{ if(e.key==='Enter' && veil.style.display!=='none') start(); });
 
-/* --- Tile click logic -------------------------------------------------- */
+/* ---------- Tile logic -------------------------------------------------- */
 function hideTile(tile){
   tile.classList.add('fall');
   remaining--;
   updateHUD();
-  confettiBurst(tile);
   if (remaining === 0) finish();
 }
-
-function updateHUD() {
+function updateHUD(){
   hud.textContent = `${remaining} tile${remaining!==1?'s':''} remaining`;
 }
 
-/* --- Finish state ------------------------------------------------------ */
-function finish() {
+/* ---------- Finish state ------------------------------------------------ */
+function finish(){
   final.classList.add('show');
-  redeemBtn.href = redeemURL;
+  redeemBtn.href = redeem;
   megaConfetti();
 }
 
-/* --- Reset ------------------------------------------------------------- */
-reset.addEventListener('click', (e)=>{ e.preventDefault(); final.classList.remove('show'); placeTiles(); updateHUD(); });
+/* ---------- Reset ------------------------------------------------------- */
+reset.addEventListener('click', e=>{
+  e.preventDefault();
+  final.classList.remove('show');
+  placeTiles();
+});
 
-/* --- Minimal confetti (no libraries) ---------------------------------- */
-function confettiBurst(originEl){
-  const rect = originEl.getBoundingClientRect();
-  const cx = rect.left + rect.width/2;
-  const cy = rect.top  + rect.height/2;
-  burstAt(cx, cy, 18);
-}
+/* ---------- Lightweight confetti (no libs) ------------------------------ */
 function megaConfetti(){
-  const rect = tiles.getBoundingClientRect();
-  burstAt(rect.left + rect.width/2, rect.top + rect.height/2, 80);
+  const area = tiles.getBoundingClientRect();
+  const cx = area.left + area.width/2;
+  const cy = area.top  + area.height/2;
+  burstAt(cx, cy, 220);
 }
-function burstAt(x, y, count){
+function burstAt(x,y,count){
   for (let i=0;i<count;i++){
     const p = document.createElement('div');
-    p.style.position = 'fixed';
-    p.style.left = x+'px'; p.style.top = y+'px';
-    p.style.width = '8px'; p.style.height='14px';
-    p.style.background = `hsl(${Math.random()*360}, 90%, 60%)`;
-    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    p.style.position='fixed';
+    p.style.left=x+'px'; p.style.top=y+'px';
+    p.style.width='8px'; p.style.height='14px';
+    p.style.background=`hsl(${Math.random()*360} 90% 60%)`;
+    p.style.transform=`rotate(${Math.random()*360}deg)`;
     p.style.borderRadius='2px';
     p.style.pointerEvents='none';
     document.body.appendChild(p);
-    const ang = Math.random()*Math.PI*2, vel = Math.random()*7+3;
-    const vx = Math.cos(ang)*vel, vy = Math.sin(ang)*vel - 4;
-    let life = 0, x0 = x, y0 = y;
-    const tick = ()=>{
-      life += 1;
-      x0 += vx; y0 += vy + life*0.15; // gravity
-      p.style.left = x0+'px'; p.style.top = y0+'px'; p.style.opacity = String(1 - life/60);
-      if (life<60) requestAnimationFrame(tick); else p.remove();
+    const ang=Math.random()*Math.PI*2, vel=Math.random()*7+3;
+    const vx=Math.cos(ang)*vel, vy=Math.sin(ang)*vel-4;
+    let life=0, x0=x, y0=y;
+    const tick=()=>{
+      life+=1;
+      x0+=vx; y0+=vy + life*0.15;
+      p.style.left=x0+'px'; p.style.top=y0+'px';
+      p.style.opacity=String(1 - life/70);
+      if(life<70) requestAnimationFrame(tick); else p.remove();
     };
     requestAnimationFrame(tick);
   }
 }
 
-/* --- Deep link: start automatically if #open present ------------------ */
+/* ---------- Deep-link autostart ---------------------------------------- */
 if (location.hash === '#open') start();
 
-/* --- Share helper in console ------------------------------------------ */
-console.log('%cTip:', 'color:#ffd3e6', 'Customize with URL params, e.g.:');
-console.log(location.origin + location.pathname + '?to=Claire&img=/voucher.jpg&redeem=https%3A%2F%2Fwww.trinnylondon.com%2F&accent=%23ff9ecf#open');
+/* ---------- Console share helper --------------------------------------- */
+console.log('Customize with URL params, e.g.:');
+console.log(location.origin + location.pathname + '?to=Claire&img=TrinnyVoucher.png&fit=contain&redeem=https%3A%2F%2Fwww.trinnylondon.com%2F&accent=%23ff9ecf#open');
 </script>
 </body>
 </html>
-
